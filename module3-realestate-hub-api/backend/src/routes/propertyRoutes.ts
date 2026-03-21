@@ -47,6 +47,12 @@ router.get('/', (req, res) => {
   void getAllProperties(req, res);
 });
 
+/* Get /api/properties/stats */
+router.get('/stats', (req, res) => {
+  void getPropertyStats(req, res);
+});
+
+
 /**
  * GET /api/properties/:id
  * Obtiene una propiedad específica por su ID.
