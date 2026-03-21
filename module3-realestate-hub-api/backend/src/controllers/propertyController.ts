@@ -60,7 +60,8 @@ export async function getAllProperties(req: Request, res: Response): Promise<voi
       city: req.query.city as string | undefined,
     };
 
-    const skip = (page - 1) * limit;  
+    const skip = (page - 1) * limit;
+  
 
     // Delegamos al repositorio
     const properties = await propertyRepository.findAll(filters, skip, limit);
@@ -91,6 +92,49 @@ export async function getAllProperties(req: Request, res: Response): Promise<voi
     });
   }
 }
+
+export async function getPropertyStats(req: Request, res: Response): Promise<void> {
+  try {
+    const total = await propertyRepository.count({});
+
+    const grouped = await propertyRepository.groupByType();
+
+    const priceStats = await propertyRepository.getPriceStats();
+
+    const byType: Record<string, number> = {};
+    const averagePrice: Record<string, number> = {};
+
+    grouped.forEach((item) => {
+      byType[item.propertyType] = item._count.propertyType;
+      averagePrice[item.propertyType] = item._avg.price || 0;
+    });
+
+    res.json({
+      success: true,
+      data: {
+        total,
+        byType,
+        averagePrice,
+        priceRange: {
+          min: priceStats._min.price || 0,
+          max: priceStats._max.price || 0,
+        },
+      },
+    });
+
+  } catch (error) {
+    console.error('Error al obtener estadísticas:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        message: 'Error interno del servidor',
+        code: 'INTERNAL_ERROR',
+      },
+    });
+  }
+}
+
+
 
 // =============================================================================
 // GET /api/properties/:id - Obtener una propiedad por ID
