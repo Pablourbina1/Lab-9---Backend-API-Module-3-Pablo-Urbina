@@ -121,15 +121,25 @@ export const propertyRepository = {
   /**
    * Busca todas las propiedades con filtros opcionales.
    */
-  async findAll(filters?: PropertyFilters): Promise<Property[]> {
+  async findAll(filters?: PropertyFilters, skip:number = 0, limit : number = 10): Promise<Property[]> {
     const where = buildWhereClause(filters);
 
     const properties = await prisma.property.findMany({
       where,
       orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit
     });
 
     return properties.map(toProperty);
+  },
+
+  async count(filters?: PropertyFilters){
+    const where = buildWhereClause(filters);
+
+    return await prisma.property.count({
+      where,
+    });
   },
 
   /**
