@@ -23,6 +23,7 @@ import {
   createProperty,
   updateProperty,
   deleteProperty,
+  getPropertyStats,
 } from '../controllers/propertyController.js';
 
 const router = Router();

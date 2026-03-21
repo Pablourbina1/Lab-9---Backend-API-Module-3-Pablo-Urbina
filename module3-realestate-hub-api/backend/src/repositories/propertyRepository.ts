@@ -107,6 +107,11 @@ function toPrismaData(data: CreatePropertyInput | UpdatePropertyInput): Record<s
   return result;
 }
 
+
+
+
+
+
 // =============================================================================
 // REPOSITORIO
 // =============================================================================
@@ -118,6 +123,33 @@ function toPrismaData(data: CreatePropertyInput | UpdatePropertyInput): Record<s
  * El controlador solo llama métodos del repositorio, no interactúa con Prisma directamente.
  */
 export const propertyRepository = {
+
+
+  // Agrupar por tipo de propiedad
+  async groupByType() {
+    return prisma.property.groupBy({
+      by: ['propertyType'],
+      _count: {
+        propertyType: true,
+      },
+      _avg: {
+        price: true,
+      },
+    });
+  },
+
+  async getPriceStats() {
+    return prisma.property.aggregate({
+      _min: {
+        price: true,
+      },
+      _max: {
+        price: true,
+      },
+    });
+  },
+
+
   /**
    * Busca todas las propiedades con filtros opcionales.
    */
